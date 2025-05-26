@@ -1,9 +1,5 @@
 package Aulas.ExempoClasseAbstrata.classe.abstrata;
 
-/**
- *
- * @author joaov
- */
 public class Tv extends Eletrodomestico{
     private int tamanho, canal, volume;
     
