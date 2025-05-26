@@ -1,4 +1,4 @@
-package exemplo.classe.abstrata;
+package Aulas.ExempoClasseAbstrata.classe.abstrata;
 
 public class ExemploClasseAbstrata {
 

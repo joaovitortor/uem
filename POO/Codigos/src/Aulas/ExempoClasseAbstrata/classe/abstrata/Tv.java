@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package exemplo.classe.abstrata;
+package Aulas.ExempoClasseAbstrata.classe.abstrata;
 
 /**
  *
@@ -12,15 +12,15 @@ public class Tv extends Eletrodomestico{
     private int tamanho, canal, volume;
     
     public Tv(int tamanho, int voltagem){
-        super(false, voltagem);
+        //super(false, voltagem);
         this.tamanho = tamanho;
         this.canal = 0;
         this.volume = 0;
     }
     
-    @Override
+    //@Override
     public void Ligar(){
-        this.setLigado(True);
+    //    this.setLigado(True);
         this.setVolume(5);
     }
 
