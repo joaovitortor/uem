@@ -35,7 +35,7 @@ Sou estudante de Ciência da Computação na UEM e utilizo este repositório par
 ## Contato
 
 Você pode me encontrar em:    
-- Email: joaovitorbidoiaangelo.com  
+- Email: joaovitorbidoiaangelo@gmail.com  
 
 ---
 
