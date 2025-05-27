@@ -14,7 +14,7 @@ SIZEOF_TAMREG = calcsize(FORMATO_TAMREG)            # 2 bytes
 # para facilitar, o arquivo 'trabalhos.dat' também foi gravado em formato 'little endian'
 
 def leia_reg(arq: io.BufferedReader) -> tuple[str, int]:
-    pass
+    
 
 
 def constroi_indice(arq: io.BufferedReader) -> list[(int, int)]:
