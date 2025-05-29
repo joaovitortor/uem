@@ -14,69 +14,86 @@ SIZEOF_TAMREG = calcsize(FORMATO_TAMREG)            # 2 bytes
 # para facilitar, o arquivo 'trabalhos.dat' também foi gravado em formato 'little endian'
 
 def leia_reg(arq: io.BufferedReader) -> tuple[str, int]:
-    # Tenta ler 2 bytes para o tamanho do registro
-    tam_bytes = arq.read(SIZEOF_TAMREG) 
-    
-    # Se não leu 2 bytes (significa que chegou ao fim do arquivo ou o arquivo é menor que 2 bytes)
-    if len(tam_bytes) < SIZEOF_TAMREG:
-        return ('', 0) # Retorna um registro vazio com tamanho 0, indicando EOF
-    
-    tam = unpack('h', tam_bytes)[0]
-    if tam > 0:
-        registro = arq.read(tam).decode()
-        return(registro, tam)
-    else:
-        return('', 0)
-    
+    tamanho = unpack(FORMATO_TAMREG, arq.read(SIZEOF_TAMREG))[0]
+    if tamanho > 0:
+        registro = arq.read(tamanho).decode()
+        return (registro, tamanho)
+    return ('', 0)
 
-
-def constroi_indice(arq: io.BufferedReader) -> list[(int, int)]:
+def constroi_indice(arq: io.BufferedReader) -> list[tuple[int, int]]:
+    '''
+    forma uma tupla com os ids e os offsets
+    '''
+    num_registros = unpack(FORMATO_HEADER, arq.read(SIZEOF_HEADER))[0]
     chaves: list[tuple[int, int]] = []
-    
-    # Lê o primeiro registro fora do loop
-    current_offset = arq.tell()
-    registro, tam_registro = leia_reg(arq)
-    
-    # O loop continua enquanto o tamanho do registro não for zero (ou seja, enquanto houver registros válidos)
-    while tam_registro != 0:
-        campos = registro.split('|')
-        # Adiciona a chave e o offset onde o registro *começa*
-        chaves.append((int(campos[0]), current_offset)) 
-        
-        # Prepara para a próxima iteração: lê o próximo registro e atualiza o offset
-        current_offset = arq.tell()
-        registro, tam_registro = leia_reg(arq)
-        
+    for _ in range(num_registros):
+        offset = arq.tell()
+        dados, tamanho = leia_reg(arq)
+        id = int((dados.split('|'))[0])
+        chaves.append((id, offset))
+    chaves.sort()
     return chaves
 
-def grava_indice(indice: list[(int, int)]) -> None:
-    pass
+def grava_indice(indice: list[tuple[int, int]]) -> None:
+    saida = open('indice.dat', 'wb')
+    quant_elem = len(indice)
+    saida.write(pack(FORMATO_HEADER, quant_elem))
+    for elem in indice:
+        saida.write(pack(FORMATO_ELEMINDICE, *elem))
 
-def carrega_indice() -> list[(int, int)]:
-    pass
+def carrega_indice() -> list[tuple[int, int]]:
+    indices = open('indice.dat', 'rb')
+    chaves: list[tuple[int, int]] = []
+    quant_elem = unpack(FORMATO_HEADER, indices.read(SIZEOF_HEADER))[0]
+    for _ in range(quant_elem):
+        id = unpack(FORMATO_HEADER, indices.read(SIZEOF_HEADER))[0]
+        offset = unpack(FORMATO_HEADER, indices.read(SIZEOF_HEADER))[0]
+        chaves.append((id, offset))
+    return chaves
 
 
-def busca_binaria(chave: int, indice: list[(int, int)]) -> int:
-    pass
+def busca_binaria(chave: int, indice: list[tuple[int, int]]) -> int:
+    i = 0
+    f = len(indice) - 1
+    while i <= f:
+        m = (i + f)//2
+        if indice[m][0] == chave:
+            return m
+        if indice[m][0] < chave:
+            i = m + 1
+        else: 
+            f = m - 1
+    return -1
+
    
 
 def le_e_imprime(arq: io.BufferedReader, offset: int) -> None:
-    pass
+    arq.seek(offset)
+    dados, tamanho = leia_reg(arq)
+    registros = dados.split('|')
+    for registro in registros:
+        print(registro)
 
-def imprime_indice(indice: list[(int, int)]) -> None:
+
+
+def imprime_indice(indice: list[tuple[int, int]]) -> None:
     pass
 
 def main() -> None:
-    nomearq = input("Digite o nome do arq: ")
-    with open('trabalhos.dat', 'rb') as entrada:
-        entrada.read(4)
-        chaves = constroi_indice(entrada)
-        print(chaves)
+    #falta melhorar a main()
+    entrada = open('trabalhos.dat', 'rb')
+    indices = constroi_indice(entrada)
+    print(indices)
+    grava_indice(indices)
 
+    print("------------------------")
+    indices1 = carrega_indice()
+    print(indices1)
 
+    busca = busca_binaria(110, indices)
+    print(busca)
+
+    le_e_imprime(entrada, 4)
 
 if __name__ == '__main__':
     main()
-
-
-#pensar melhor
